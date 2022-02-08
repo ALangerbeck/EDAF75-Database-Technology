@@ -17,7 +17,19 @@ customers(_username_, name, password)
 
 # Question 7
 ## Solution 1:
-Theater capacity - number of tickets 
+Theater capacity - size of ticket table
+
+Pros: Now data is accidentaly erased; few updates in table; 
+Cons: Not contiunaly updated perhaps
+
+
 ## Solution 2: 
+A table  attributes entry with number of availible seats in screening which updates every time a ticket is sold
+
+Pros: No need to check size of ticket table, countinously updated
+Cons: Need to update attribute, no history since data is erased which can lead to problems
+
+
+
 
 
