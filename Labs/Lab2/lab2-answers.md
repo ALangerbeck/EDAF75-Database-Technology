@@ -1,12 +1,12 @@
 # Question 4
 ## a. 
-Theaters-screening, screening-ticket,
+Theaters-screening, ~~screening-ticket~~
 ## b. 
 Theater name can change so yes
 ## c. 
 movie
 ## d. 
-ticket_id is invented
+ticket_id is invented, screening otherwise we need to keep track of date,time & theater
 
 # Qusetion 6
 theaters(_theater_name_, capacity)
