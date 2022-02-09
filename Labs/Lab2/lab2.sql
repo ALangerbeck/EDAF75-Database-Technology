@@ -1,43 +1,47 @@
-DROP TABLE IF EXISTS theater;
-CREATE TABLE theater(
+PRAGMA foreign_keys=OFF;
+
+DROP TABLE IF EXISTS theaters;
+DROP TABLE if EXISTS screenings;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS customers;
+
+PRAGMA foreign_keys=OFF;
+
+CREATE TABLE theaters(
     theater_name    TEXT,
     capacity        INT,
     PRIMARY KEY (theater_name)     
 );
 
-DROP TABLE if EXISTS screenings;
 CREATE TABLE screenings(
     screening_id    TEXT DEFAULT (lower(hex(randomblob(16)))),
     start_date      DATE,
     start_time      TIME,
     theater_name    TEXT,
     imdb_key        TEXT,
-    FOREIGN KEY (theater_name) REFERENCES theater(theater_name),
+    FOREIGN KEY (theater_name) REFERENCES theaters(theater_name),
     FOREIGN KEY (imdb_key) REFERENCES movies(imdb_key),
     PRIMARY KEY (start_time,start_date,theater_name)
 );
 
-DROP TABLE IF EXISTS movies;
 CREATE TABLE movies(
     imdb_key        TEXT,
     title           TEXT,
-    production_year TEXT,
+    production_year INT,
     running_time    INT,
     PRIMARY KEY (imdb_key)
 );
 
-DROP TABLE IF EXISTS tickets;
 CREATE TABLE tickets(
     ticket_id       TEXT DEFAULT (lower(hex(randomblob(16)))),
     screening_id    TEXT,
-    theater_name    TEXT,
     username        TEXT,
     FOREIGN KEY (screening_id) REFERENCES screenings(screening_id),
     FOREIGN KEY (username) REFERENCES customers(username),
     PRIMARY KEY (ticket_id) 
 );
 
-DROP TABLE IF EXISTS customers;
 CREATE TABLE customers(
     username            TEXT,
     customer_name       TEXT,
@@ -45,4 +49,33 @@ CREATE TABLE customers(
     PRIMARY KEY (username)
 );
 
+INSERT 
+INTO theaters(theater_name,capacity)
+VALUES  
+    ('Filmstaden Mårtenstorg','300'),
+    ('Filmstaden Royal','100'),
+    ('Filmstaden Storgatan','50');
+
+INSERT
+INTO screenings(start_date,start_time,theater_name,imdb_key)
+VALUES  ('2022-02-10','18:00','Filmstaden Mårtenstorg','tt0060196'),
+        ('2022-02-11','18:00','Filmstaden Mårtenstorg','tt0060196')
+        ('2022-02-10','21:00','Filmstaden Mårtenstorg','tt0482571'),
+        ('2022-02-10','18:00','Filmstaden Royal','tt0060196'),
+        ('2022-02-10','21:00','Filmstaden Royal','tt0105236'),
+        ('2022-02-10','18:00','Filmstaden Storgatan','tt0060196'),
+        ('2022-02-10','21:00','Filmstaden Storgatan','tt0108052');
+
+INSERT
+INTO movies(imdb_key,title,production_year,running_time)
+VALUES  ('tt0060196','The Good, the Bad and the Ugly',1966,178),
+        ('tt0482571','The Prestige',2006,130),
+        ('tt0105236','Reservoir Dogs',1992,99),
+        ('tt0108052','Schindlers List',1993,195);
+
+INSERT
+INTO customers(username,customer_name,customer_password)
+VALUES  ('Bippi','Bippi Sångstrump','LillaSnubben1337'),
+        ('Mippi','Mippi Tångstrump','LillaMubben1337'),
+        ('pippi','Pippi Långstrump','LillaGubben1337');
 
