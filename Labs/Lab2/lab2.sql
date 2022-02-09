@@ -16,13 +16,13 @@ CREATE TABLE theaters(
 
 CREATE TABLE screenings(
     screening_id    TEXT DEFAULT (lower(hex(randomblob(16)))),
-    start_date      DATE,
-    start_time      TIME,
+    screening_date      DATE,
+    screening_time      TIME,
     theater_name    TEXT,
     imdb_key        TEXT,
     FOREIGN KEY (theater_name) REFERENCES theaters(theater_name),
     FOREIGN KEY (imdb_key) REFERENCES movies(imdb_key),
-    PRIMARY KEY (start_time,start_date,theater_name)
+    PRIMARY KEY (screening_id)
 );
 
 CREATE TABLE movies(
@@ -52,15 +52,15 @@ CREATE TABLE customers(
 INSERT 
 INTO theaters(theater_name,capacity)
 VALUES  
-    ('Filmstaden Mårtenstorg','300'),
+    ('Filmstaden Martenstorg','300'),
     ('Filmstaden Royal','100'),
     ('Filmstaden Storgatan','50');
 
 INSERT
-INTO screenings(start_date,start_time,theater_name,imdb_key)
-VALUES  ('2022-02-10','18:00','Filmstaden Mårtenstorg','tt0060196'),
-        ('2022-02-11','18:00','Filmstaden Mårtenstorg','tt0060196')
-        ('2022-02-10','21:00','Filmstaden Mårtenstorg','tt0482571'),
+INTO screenings(screening_date,screening_time,theater_name,imdb_key)
+VALUES  ('2022-02-10','18:00','Filmstaden Martenstorg','tt0060196'),
+        ('2022-02-11','18:00','Filmstaden Martenstorg','tt0060196'),
+        ('2022-02-10','21:00','Filmstaden Martenstorg','tt0482571'),
         ('2022-02-10','18:00','Filmstaden Royal','tt0060196'),
         ('2022-02-10','21:00','Filmstaden Royal','tt0105236'),
         ('2022-02-10','18:00','Filmstaden Storgatan','tt0060196'),
@@ -75,7 +75,7 @@ VALUES  ('tt0060196','The Good, the Bad and the Ugly',1966,178),
 
 INSERT
 INTO customers(username,customer_name,customer_password)
-VALUES  ('Bippi','Bippi Sångstrump','LillaSnubben1337'),
-        ('Mippi','Mippi Tångstrump','LillaMubben1337'),
-        ('pippi','Pippi Långstrump','LillaGubben1337');
+VALUES  ('Bippi','Bippi Sangstrump','LillaSnubben1337'),
+        ('Mippi','Mippi Tangstrump','LillaMubben1337'),
+        ('pippi','Pippi Langstrump','LillaGubben1337');
 
