@@ -16,8 +16,8 @@ CREATE TABLE theaters(
 
 CREATE TABLE screenings(
     screening_id    TEXT DEFAULT (lower(hex(randomblob(16)))),
-    screening_date      DATE,
-    screening_time      TIME,
+    starting_date      DATE,
+    starting_time      TIME,
     theater_name    TEXT,
     imdb_key        TEXT,
     FOREIGN KEY (theater_name) REFERENCES theaters(theater_name),
@@ -57,7 +57,7 @@ VALUES
     ('Filmstaden Storgatan','50');
 
 INSERT
-INTO screenings(screening_date,screening_time,theater_name,imdb_key)
+INTO screenings(starting_date,starting_time,theater_name,imdb_key)
 VALUES  ('2022-02-10','18:00','Filmstaden Martenstorg','tt0060196'),
         ('2022-02-11','18:00','Filmstaden Martenstorg','tt0060196'),
         ('2022-02-10','21:00','Filmstaden Martenstorg','tt0482571'),
