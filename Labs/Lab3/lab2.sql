@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS movies;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS customers;
 
-PRAGMA foreign_keys=OFF;
+PRAGMA foreign_keys=ON;
 
 CREATE TABLE theaters(
     theater_name    TEXT,
