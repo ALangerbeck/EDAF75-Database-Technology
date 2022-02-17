@@ -100,7 +100,7 @@ def post_addUser():
         else:
             response.status = 201
             username, = found
-            return f"http://localhost:3000/users/{username}"
+            return f"/users/{username}"
     except sqlite3.IntegrityError:
         response.status = 400
         return ""
@@ -127,7 +127,7 @@ def post_addUser():
         else:
             response.status = 201
             imdbKey, = found
-            return f"http://localhost:3000/users/{imdbKey}"
+            return f"/movies/{imdbKey}"
     except sqlite3.IntegrityError:
         response.status = 400
         return ""
@@ -192,9 +192,144 @@ def post_addUser():
         else:
             response.status = 201
             screening_id, = found
-            return f"http://localhost:3000/performances/{screening_id}"
+            return f"/performances/{screening_id}"
     except sqlite3.IntegrityError:
         response.status = 400
         return "No such movie or theater"
+    db.commit()
 
-run(host='localhost', port=3000)
+
+@get('/performances')
+def get_performances():
+    query = """
+        SELECT   screening_id, starting_date, starting_time, title, production_year, theater_name
+        FROM     movies
+        JOIN screenings 
+        USING (imdb_key)
+        JOIN theaters 
+        USING (theater_name)
+        """
+    c = db.cursor()
+    c.execute(query)
+    
+    found = []
+    for row in c:
+        screening_id = row[0]
+        starting_date = row[1]
+        starting_time = row[2]
+        title = row[3]
+        production_year = row[4]
+        theater_name = row[5]
+        c2 = db.cursor()
+        c2.execute(
+            """
+            SELECT capacity
+            FROM theaters
+            WHERE theater_name = ?
+            """, [theater_name]
+            )
+        capacity = c2.fetchone()[0]
+        c2.execute(
+            """
+            SELECT count(screening_id)
+            FROM tickets
+            WHERE screening_id = ?
+
+            """,[screening_id]
+            )
+        no_tickets = c2.fetchone()[0]
+        d = dict()
+        d['performanceId'] = screening_id
+        d['date'] = starting_date
+        d['startTime'] = starting_time
+        d['title'] = title
+        d['year'] = production_year
+        d['theater'] = theater_name
+        d['remainingSeats'] = (capacity - no_tickets)
+        found.append(d)
+
+    response.status = 200
+    return {"data": found}
+
+@post('/tickets')
+def post_tickets():
+    try :
+        ticket = request.json
+        c2 = db.cursor()
+        c2.execute(
+            """
+            SELECT capacity,screening_id
+            FROM screenings
+            JOIN  theaters
+            USING (theater_name)
+            WHERE screening_id = ?
+            """, [ticket["performanceId"]]
+            )
+        capacity = c2.fetchone()[0]
+
+        c2.execute(
+            """
+            SELECT count(screening_id)
+            FROM tickets
+            WHERE screening_id = ?
+
+            """,[ticket["performanceId"]]
+            )
+        no_tickets = c2.fetchone()[0]
+
+        if ((capacity - no_tickets)  == 0):
+            response.status = 400
+            return "No tickets left"
+        c2.execute(
+            """
+            SELECT username
+            FROM customers
+            WHERE username = ? AND customer_password = ?
+            """,[ticket["username"],ticket["pwd"]]
+            )
+        if c2.fetchone()[0] == None:
+            response.status = 401
+            return "Wrong user credentials"
+        c2.execute(
+            """
+            INSERT INTO tickets(screening_id,username)
+            VALUES (?,?)
+            RETURNING ticket_id
+            """,[ticket["performanceId"],ticket["username"]]
+            )
+        ticket_id = c2.fetchone()[0]
+        response.status = 201
+        return f"/tickets/{ticket_id}"
+    
+    except sqlite3.IntegrityError:
+        response.status = 400
+        return "Error"
+
+
+@get('/users/<username>/tickets')
+def getTickets(username):
+    c2 = db.cursor()
+    c2.execute(
+        """
+        WITH nbr_ticket(screening_id, nbr_tickets) AS (
+            SELECT screening_id,count() AS nbr_tickets
+            FROM tickets
+            WHERE username = ?
+            GROUP BY screening_id )
+        SELECT starting_date,starting_time,theater_name,title,production_year,nbr_tickets
+        FROM screenings
+        JOIN movies
+        USING (imdb_key)
+        JOIN nbr_ticket
+        USING (screening_id)
+        """,[username]
+        )
+
+    found = [{"date":starting_date, "startTime":starting_time,"theater":theater_name,"title":title,"year":production_year,"nbrOfTickets":nbr_tickets}
+        for starting_date,starting_time,theater_name,title,production_year,nbr_tickets in c2]
+    response.status = 201
+    return {"data": found}
+
+
+
+run(host='localhost', port=7007)
